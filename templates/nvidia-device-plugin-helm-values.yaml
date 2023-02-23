@@ -1,0 +1,10 @@
+nodeSelector: 
+  nvidia.com/gpu.deploy.device-plugin: 'true'
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 100Mi
+  limits:
+    cpu: 150m
+    memory: 256Mi

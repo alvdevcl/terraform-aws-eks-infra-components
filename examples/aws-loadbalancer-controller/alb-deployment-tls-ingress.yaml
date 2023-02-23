@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aspnetapp
+  labels:
+    app: aspnetapp
+spec:
+  containers:
+  - image: "mcr.microsoft.com/dotnet/core/samples:aspnetapp"
+    name: aspnetapp-image
+    ports:
+    - containerPort: 80
+      protocol: TCP
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: aspnetapp
+spec:
+  selector:
+    app: aspnetapp
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 80
+  - name: https
+    protocol: TCP
+    port: 443
+    targetPort: 80
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: aspnetapp
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internal
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/group.name: albgroup1
+    alb.ingress.kubernetes.io/group.order: '10'
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-west-2:836816519470:certificate/45b5194c-e360-4ba1-bb83-0701bc1a8a80
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /*
+            backend:
+              serviceName: aspnetapp
+              servicePort: 443
+      host: phlp-asp.dev.ops360.alveo-sandbox.net
+  tls:
+  - hosts: 
+      - phlp-asp.dev.ops360.alveo-sandbox.net
